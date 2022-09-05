@@ -1,85 +1,53 @@
 ---
-Duration: 5m
-
-M1StartTemperature: 33
-M1StartVoltage: 33000
-M1StartTxPower: -1000
-M1StartRxPower: -1100
-
-M2StartTemperature: 31
-M2StartVoltage: 33000
-M2StartTxPower: -1000
-M2StartRxPower: -1100
-
-Modules:
-  - M1:
-    - Voltage:
-      - step:
-        - end: 33000
-        - duration: 5m
-    - Temperature:
-      - step:
-        - end: 33
-        - duration: 2m
-      - step:
-        - end: 32
-        - duration: 3m
-    - TxPower:
-      - step:
-        - end: -1000
-        - duration: 5m
-    - RxPower:
-      - step:
-        - end: -1100
-        - duration: 2m
-      - step:
-        - end: -3850
-        - duration: 1s
-      - step:
-        - end: -3850
-        - duration: 3m
-    - Osnr:
-      - step:
-        - end: 230
-        - duration: 2m
-      - step:
-        - end: 0
-        - duration: 1s
-      - step:
-        - end: 0
-        - duration: 3m
-  - M2:
-    - Voltage:
-      - step:
-        - end: 33000
-        - duration: 5m
-    - Temperature:
-      - step:
-        - end: 31
-        - duration: 5m
-    - TxPower:
-      - step:
-        - end: -1000
-        - duration: 5m
-    - RxPower:
-      - step:
-        - end: -1100
-        - duration: 2m
-      - step:
-        - end: -3850
-        - duration: 1s
-      - step:
-        - end: -3850
-        - duration: 3m
-    - Osnr:
-      - step:
-        - end: 230
-        - duration: 2m
-      - step:
-        - end: 0
-        - duration: 1s
-      - step:
-        - end: 0
-        - duration: 3m
-
+ScenarioDuration: 300
+ScenarioModules:
+  - Voltage:
+      - endval: 33000
+        duration: 300
+    Temperature:
+      - endval: 33
+        duration: 120
+      - endval: 32
+        duration: 180
+    TxPower:
+      - endval: -1000
+        duration: 300
+    RxPower:
+      - endval: -1100
+        duration: 120
+      - endval: -3850
+        duration: 1
+      - endval: -3850
+        duration: 179
+    Osnr:
+      - endval: 230
+        duration: 120
+      - endval: 0
+        duration: 1
+      - endval: 0
+        duration: 179
+  
+  - Voltage:
+      - endval: 33000
+        duration: 300
+    Temperature:
+      - endval: 31
+        duration: 300
+    TxPower:
+      - endval: -1000
+        duration: 300
+    RxPower:
+      - endval: -1100
+        duration: 120
+      - endval: -3850
+        duration: 1
+      - endval: -3850
+        duration: 179
+    Osnr:
+      - endval: 230
+        duration: 120
+      - endval: 0
+        duration: 1
+      - endval: 0
+        duration: 179
 ...
