@@ -15,4 +15,12 @@ func main() {
 
 	fmt.Println(opers.GetScenarioConfig(*scenarioFilename))
 	fmt.Println(opers.GetModulesConfig(*modulesFilename))
+
+	data1 := []uint8{0x12, 0x99, 0x88}
+	data2 := []uint8{0x13, 0x80, 0x99}
+
+	data := [][]byte{data1, data2}
+
+	opers.EepromToFiles("./", "tmp", data)
+
 }
