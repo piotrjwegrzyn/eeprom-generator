@@ -2,7 +2,7 @@ package opers
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 
 	"gopkg.in/yaml.v2"
 )
@@ -59,7 +59,7 @@ type ScenarioConfig struct {
 
 func GetModulesConfig(filename string) ModulesConfig {
 
-	modulesConfig, err := ioutil.ReadFile(filename)
+	modulesConfig, err := os.ReadFile(filename)
 
 	if err != nil {
 		fmt.Printf("Error while opening file %s\n", filename)
@@ -79,7 +79,7 @@ func GetModulesConfig(filename string) ModulesConfig {
 
 func GetScenarioConfig(filename string) ScenarioConfig {
 
-	scenarioConfig, err := ioutil.ReadFile(filename)
+	scenarioConfig, err := os.ReadFile(filename)
 
 	if err != nil {
 		fmt.Printf("Error while opening file %s\n", filename)

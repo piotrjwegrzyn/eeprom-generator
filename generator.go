@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"pi-wegrzyn/eeprom-generator/opers"
 )
 
@@ -13,13 +12,10 @@ func main() {
 
 	flag.Parse()
 
-	fmt.Println(opers.GetScenarioConfig(*scenarioFilename))
-	fmt.Println(opers.GetModulesConfig(*modulesFilename))
+	scenarioConfig := opers.GetScenarioConfig(*scenarioFilename)
+	modulesConfig := opers.GetModulesConfig(*modulesFilename)
 
-	data1 := []uint8{0x12, 0x99, 0x88}
-	data2 := []uint8{0x13, 0x80, 0x99}
-
-	data := [][]byte{data1, data2}
+	data := [][]byte{opers.CreateTimelapse(modulesConfig.Modules[0], scenarioConfig.ScenarioModules[0], scenarioConfig.Duration)}
 
 	opers.EepromToFiles("./", "tmp", data)
 
