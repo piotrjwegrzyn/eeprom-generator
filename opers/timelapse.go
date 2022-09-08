@@ -2,8 +2,8 @@ package opers
 
 func CreateTimelapse(module Module, scenario ScenarioModule, duration int) (timelapse []byte) {
 
-	timelapse = append(timelapse, GeneratePageLow()...)
-	timelapse = append(timelapse, GeneratePage00h()...)
+	timelapse = append(timelapse, GeneratePageLow(module)...)
+	timelapse = append(timelapse, GeneratePage00h(module)...)
 	timelapse = append(timelapse, GeneratePage01h()...)
 	timelapse = append(timelapse, GeneratePage02h()...)
 	timelapse = append(timelapse, GeneratePage04h()...)

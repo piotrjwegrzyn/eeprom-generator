@@ -8,7 +8,7 @@ Modules:
   MediaType: 0x02 # CMIS P116, T8-16
   # Page 00h
   VendorName: FibreFiberLtd
-  DateCode: 2022-08-25  # production date
+  DateCode: 20220825  # production date
   MaxPower: 0x50  # U8 max power consumption (multiplied by 0.25W)
   # Page 01h
   LenghtSMF: 120 # in kilometers
@@ -41,7 +41,7 @@ Modules:
   MediaType: 0x02 # CMIS P116, T8-16
   # Page 00h
   VendorName: FibreFiberLtd
-  DateCode: 2022-08-25  # production date
+  DateCode: 20220825  # production date
   MaxPower: 0x50  # U8 max power consumption (multiplied by 0.25W)
   # Page 01h
   LenghtSMF: 120 # in kilometers
