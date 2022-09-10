@@ -2,6 +2,8 @@ package opers
 
 import (
 	"crypto/md5"
+	"math/rand"
+	"time"
 )
 
 func Checksum(data []byte) byte {
@@ -87,9 +89,12 @@ func GeneratePage24h() (page []byte) {
 	return
 }
 
-func GeneratePage25h() (page []byte) {
-	for i := 0; i < 128; i++ {
-		page = append(page, byte(i))
-	}
+func GeneratePage25h(osnr int, temperature int) (page []byte) {
+	page = append(page, make([]byte, 32)...)
+	rand.Seed(time.Now().UTC().UnixNano())
+	modOsnr := uint16(osnr + (rand.Intn(2*temperature)-temperature)/3)
+	page = append(page, []byte{byte(modOsnr >> 8), byte(modOsnr & 0xFF)}...) // VDM real-time OSNR
+	page = append(page, make([]byte, 94)...)
+
 	return
 }

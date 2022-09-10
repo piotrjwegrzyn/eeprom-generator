@@ -19,7 +19,7 @@ ScenarioModules:
         duration: 1
       - endval: -3850
         duration: 179
-    Osnr:
+    Osnr: # in 0.1 dB
       - endval: 230
         duration: 120
       - endval: 0

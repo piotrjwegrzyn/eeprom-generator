@@ -11,7 +11,7 @@ func CreateTimelapse(module Module, scenario ScenarioModule, duration int) (time
 	timelapse = append(timelapse, GeneratePage11h()...)
 	timelapse = append(timelapse, GeneratePage12h()...)
 	timelapse = append(timelapse, GeneratePage24h()...)
-	timelapse = append(timelapse, GeneratePage25h()...)
+	timelapse = append(timelapse, GeneratePage25h(scenario.Osnr[0].Endval, scenario.Temperature[0].Endval)...)
 
 	return
 }
