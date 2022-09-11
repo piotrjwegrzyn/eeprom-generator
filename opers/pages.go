@@ -171,11 +171,18 @@ func GeneratePage11h() (page []byte) {
 	return
 }
 
-func GeneratePage12h() (page []byte) {
-
-	for i := 0; i < 128; i++ {
-		page = append(page, byte(i))
-	}
+func GeneratePage12h(module Module) (page []byte) {
+	page = append(page, byte(0b0101<<4))    // GridSpacingTx1
+	page = append(page, make([]byte, 7)...) // GridSpacingTx2-8
+	channelNumber := int16((module.CurrentLaserFrequencyTxx - 193100000) / 100)
+	page = append(page, byte(channelNumber>>8), byte(channelNumber&0xFF)) // ChannelNumberTx1
+	page = append(page, make([]byte, 30)...)
+	freq := uint32(module.CurrentLaserFrequencyTxx)                                                          // ChannelNumberTx2-8 + FineTuningOffsetTx
+	page = append(page, byte((freq>>24)&0xFF), byte((freq>>16)&0xFF), byte((freq>>8)&0xFF), byte(freq&0xFF)) // CurrentLaserFrequencyTx1
+	page = append(page, make([]byte, 28)...)
+	pwr := int16(module.TargetOutputPowerTxx)
+	page = append(page, byte(pwr>>8), byte(pwr&0xFF)) // TargetOutputPowerTxx1
+	page = append(page, make([]byte, 54)...)          // TargetOutputPowerTxx2-8
 	return
 }
 
