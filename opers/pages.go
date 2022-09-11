@@ -51,16 +51,16 @@ func GeneratePageLow(module Module, temperature float32, vcc uint16) (page []byt
 	page = append(page, flagsIndicator)     // Latched Flags
 	page = append(page, make([]byte, 4)...) // Aux and Custom Flags
 	TempMonValue := int16(temperature * 256)
-	page = append(page, []byte{byte(TempMonValue >> 8), byte(TempMonValue & 0xFF)}...)                   // TempMonValue
-	page = append(page, []byte{byte(vcc >> 8), byte(vcc & 0xFF)}...)                                     // VccMonVoltage
-	page = append(page, make([]byte, 14)...)                                                             // Aux + Custom + Global Controls
-	page = append(page, byte(0xFF))                                                                      // Module Level Masks (Vcc + Temp)
-	page = append(page, make([]byte, 6)...)                                                              // -||- (Aux + Custom) + CDB status
-	page = append(page, []byte{byte(module.ModuleRevision >> 8), byte(module.ModuleRevision & 0xFF)}...) // Module Active Firmware Version
-	page = append(page, make([]byte, 44)...)                                                             // Fault Information + Reserved + Custom
-	page = append(page, byte(module.MediaType))                                                          // MediaType
+	page = append(page, byte(TempMonValue>>8), byte(TempMonValue&0xFF))                   // TempMonValue
+	page = append(page, byte(vcc>>8), byte(vcc&0xFF))                                     // VccMonVoltage
+	page = append(page, make([]byte, 14)...)                                              // Aux + Custom + Global Controls
+	page = append(page, byte(0xFF))                                                       // Module Level Masks (Vcc + Temp)
+	page = append(page, make([]byte, 6)...)                                               // -||- (Aux + Custom) + CDB status
+	page = append(page, byte(module.ModuleRevision>>8), byte(module.ModuleRevision&0xFF)) // Module Active Firmware Version
+	page = append(page, make([]byte, 44)...)                                              // Fault Information + Reserved + Custom
+	page = append(page, byte(module.MediaType))                                           // MediaType
 	for i := 0; i < 8; i++ {
-		page = append(page, []byte{0xFF, 0x00, 0x00, 0x00}...) // AppDescriptors
+		page = append(page, 0xFF, 0x00, 0x00, 0x00) // AppDescriptors
 	}
 	page = append(page, make([]byte, 10)...) // Password Facilities + Page Mapping
 
@@ -145,10 +145,15 @@ func GeneratePage02h(module Module) (page []byte) {
 	return
 }
 
-func GeneratePage04h() (page []byte) {
-	for i := 0; i < 128; i++ {
-		page = append(page, byte(i))
-	}
+func GeneratePage04h(module Module) (page []byte) {
+	page = append(page, byte(1<<5))
+	page = append(page, make([]byte, 21)...)                                                      // Unsupported Grids
+	page = append(page, 0xFF, 0xEE, 0x00, 0x1E)                                                   // GridChannel100GHz
+	page = append(page, make([]byte, 44)...)                                                      // Unsupported Grids + FineTuning
+	page = append(page, byte(module.ProgOutputPowerMin>>8), byte(module.ProgOutputPowerMin&0xFF)) // ProgOutputPowerMin
+	page = append(page, byte(module.ProgOutputPowerMax>>8), byte(module.ProgOutputPowerMax&0xFF)) // ProgOutputPowerMax
+	page = append(page, make([]byte, 53)...)                                                      // Reserved
+	page = append(page, Checksum(page[0:126]))                                                    // Page Checksum
 	return
 }
 

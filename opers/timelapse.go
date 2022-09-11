@@ -9,7 +9,7 @@ func CreateTimelapse(module Module, scenario ScenarioModule, duration int) (time
 	timelapse = append(timelapse, GeneratePage00h(module)...)
 	timelapse = append(timelapse, GeneratePage01h()...)
 	timelapse = append(timelapse, GeneratePage02h(module)...)
-	timelapse = append(timelapse, GeneratePage04h()...)
+	timelapse = append(timelapse, GeneratePage04h(module)...)
 	timelapse = append(timelapse, GeneratePage10h()...)
 	timelapse = append(timelapse, GeneratePage11h()...)
 	timelapse = append(timelapse, GeneratePage12h()...)

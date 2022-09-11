@@ -58,7 +58,6 @@ Modules:
   ProgOutputPowerMin: -2290 # in 0.01 dBm
   ProgOutputPowerMax: 400
   # Page 12h
-  GridSpacingTxx: 0x50 # CMIS P173, T8-65
   CurrentLaserFrequencyTxx: 193100000 # in MHz
   TargetOutputPowerTxx: -1250 # in 0.01 dBm
 ...
