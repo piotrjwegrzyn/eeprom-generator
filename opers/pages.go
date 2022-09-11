@@ -11,11 +11,59 @@ func Checksum(data []byte) byte {
 	return checksum[len(checksum)-1]
 }
 
-func GeneratePageLow(module Module) (page []byte) {
-	page = append(page, byte(module.SFF8024Identifier))
-	for i := 0; i < 127; i++ {
-		page = append(page, byte(i))
+const TempMonAlarmThreshold int = 10           // in Celsius degrees, added/substracted as High/Low Alarm
+const VccMonAlarmThreshold int = 300           // in 0.1 mV, -||-
+const OpticalTxRxAlarmThreshold float32 = 1.25 // multiplicable factor for Optics Alarms
+
+func GeneratePageLow(module Module, temperature float32, vcc uint16) (page []byte) {
+	page = append(page, byte(module.SFF8024Identifier)) // SFF8024Identifier
+	page = append(page, byte(module.CmisRevision))      // CmisRevision
+	page = append(page, byte(0x04))                     // MemoryModel + SteppedConfigOnly + MciMaxSpeed
+	page = append(page, byte(0b0101))                   // ModuleState
+	page = append(page, make([]byte, 5)...)             // FlagsSummary (Banks and others)
+	var flagsIndicator byte = 0
+	{
+		if vcc < uint16(module.VccMonLowWarningThreshold) {
+			flagsIndicator = flagsIndicator | (0x1 << 7)
+		}
+		if vcc > uint16(module.VccMonHighWarningThreshold) {
+			flagsIndicator = flagsIndicator | (0x1 << 6)
+		}
+		if vcc < uint16(module.VccMonLowWarningThreshold-VccMonAlarmThreshold) {
+			flagsIndicator = flagsIndicator | (0x1 << 5)
+		}
+		if vcc > uint16(module.VccMonHighWarningThreshold+VccMonAlarmThreshold) {
+			flagsIndicator = flagsIndicator | (0x1 << 4)
+		}
+		if temperature < float32(module.TempMonLowWarningThreshold) {
+			flagsIndicator = flagsIndicator | (0x1 << 3)
+		}
+		if temperature > float32(module.TempMonHighWarningThreshold) {
+			flagsIndicator = flagsIndicator | (0x1 << 2)
+		}
+		if temperature < float32(module.TempMonLowWarningThreshold-TempMonAlarmThreshold) {
+			flagsIndicator = flagsIndicator | (0x1 << 1)
+		}
+		if temperature > float32(module.TempMonHighWarningThreshold+TempMonAlarmThreshold) {
+			flagsIndicator = flagsIndicator | 0x1
+		}
 	}
+	page = append(page, flagsIndicator)     // Latched Flags
+	page = append(page, make([]byte, 4)...) // Aux and Custom Flags
+	TempMonValue := int16(temperature * 256)
+	page = append(page, []byte{byte(TempMonValue >> 8), byte(TempMonValue & 0xFF)}...)                   // TempMonValue
+	page = append(page, []byte{byte(vcc >> 8), byte(vcc & 0xFF)}...)                                     // VccMonVoltage
+	page = append(page, make([]byte, 14)...)                                                             // Aux + Custom + Global Controls
+	page = append(page, byte(0xFF))                                                                      // Module Level Masks (Vcc + Temp)
+	page = append(page, make([]byte, 6)...)                                                              // -||- (Aux + Custom) + CDB status
+	page = append(page, []byte{byte(module.ModuleRevision >> 8), byte(module.ModuleRevision & 0xFF)}...) // Module Active Firmware Version
+	page = append(page, make([]byte, 44)...)                                                             // Fault Information + Reserved + Custom
+	page = append(page, byte(module.MediaType))                                                          // MediaType
+	for i := 0; i < 8; i++ {
+		page = append(page, []byte{0xFF, 0x00, 0x00, 0x00}...) // AppDescriptors
+	}
+	page = append(page, make([]byte, 10)...) // Password Facilities + Page Mapping
+
 	return
 }
 
@@ -76,13 +124,7 @@ func GeneratePage11h() (page []byte) {
 }
 
 func GeneratePage12h() (page []byte) {
-	for i := 0; i < 128; i++ {
-		page = append(page, byte(i))
-	}
-	return
-}
 
-func GeneratePage24h() (page []byte) {
 	for i := 0; i < 128; i++ {
 		page = append(page, byte(i))
 	}

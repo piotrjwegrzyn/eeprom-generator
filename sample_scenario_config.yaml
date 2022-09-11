@@ -1,18 +1,18 @@
 ---
 ScenarioDuration: 300
 ScenarioModules:
-  - Voltage:
+  - Voltage: # in mV
       - endval: 33000
         duration: 300
-    Temperature:
-      - endval: 33
+    Temperature: # in 0.1 C's degrees
+      - endval: 330
         duration: 120
-      - endval: 32
+      - endval: 320
         duration: 180
-    TxPower:
+    TxPower: # in 0.01 dBm
       - endval: -1000
         duration: 300
-    RxPower:
+    RxPower: # in 0.01 dBm
       - endval: -1100
         duration: 120
       - endval: -3850
@@ -31,7 +31,7 @@ ScenarioModules:
       - endval: 33000
         duration: 300
     Temperature:
-      - endval: 31
+      - endval: 310
         duration: 300
     TxPower:
       - endval: -1000
