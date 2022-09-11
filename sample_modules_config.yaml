@@ -21,8 +21,6 @@ Modules:
   VccMonLowWarningThreshold: 31680
   OpticalPowerTxHighWarningThreshold: 6309 # in 0.1 uW
   OpticalPowerTxLowWarningThreshold: 251
-  LaserBiasCurrentHighWarningThreshold: 0 #?
-  LaserBiasCurrentLowWarningThreshold: 0 #?
   OpticalPowerRxHighWarningThreshold: 10000 # in 0.1 uW
   OpticalPowerRxLowWarningThreshold: 100
   # Page 04h
@@ -54,8 +52,6 @@ Modules:
   VccMonLowWarningThreshold: 31680
   OpticalPowerTxHighWarningThreshold: 6309 # in 0.1 uW
   OpticalPowerTxLowWarningThreshold: 251
-  LaserBiasCurrentHighWarningThreshold: 0 #?
-  LaserBiasCurrentLowWarningThreshold: 0 #?
   OpticalPowerRxHighWarningThreshold: 10000 # in 0.1 uW
   OpticalPowerRxLowWarningThreshold: 100
   # Page 04h

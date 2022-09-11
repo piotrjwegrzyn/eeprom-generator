@@ -95,10 +95,53 @@ func GeneratePage01h() (page []byte) {
 	return
 }
 
-func GeneratePage02h() (page []byte) {
-	for i := 0; i < 128; i++ {
-		page = append(page, byte(i))
+func GeneratePage02h(module Module) (page []byte) {
+	// Module-Level Monitor Thresholds (Temp)
+	tempTemps := []int16{int16((module.TempMonHighWarningThreshold + TempMonAlarmThreshold) * 256),
+		int16((module.TempMonLowWarningThreshold - TempMonAlarmThreshold) * 256),
+		int16(module.TempMonHighWarningThreshold * 256),
+		int16(module.TempMonLowWarningThreshold * 256),
 	}
+	for _, v := range tempTemps {
+		page = append(page, byte(v>>8), byte(v&0xFF))
+	}
+
+	// Module-Level Monitor Thresholds (Vcc)
+	tempVccs := []uint16{uint16(module.VccMonHighWarningThreshold + VccMonAlarmThreshold),
+		uint16(module.VccMonLowWarningThreshold - VccMonAlarmThreshold),
+		uint16(module.VccMonHighWarningThreshold),
+		uint16(module.VccMonLowWarningThreshold),
+	}
+	for _, v := range tempVccs {
+		page = append(page, byte(v>>8), byte(v&0xFF))
+	}
+
+	page = append(page, make([]byte, 32)...) // Aux + Custom
+
+	// Module-Level Monitor Thresholds (OpticalPowerTx)
+	tempOpticalTxs := []uint16{uint16(float32(module.OpticalPowerTxHighWarningThreshold) * OpticalTxRxAlarmThreshold),
+		uint16(float32(module.OpticalPowerTxLowWarningThreshold) / OpticalTxRxAlarmThreshold),
+		uint16(module.OpticalPowerTxHighWarningThreshold),
+		uint16(module.OpticalPowerTxLowWarningThreshold),
+	}
+	for _, v := range tempOpticalTxs {
+		page = append(page, byte(v>>8), byte(v&0xFF))
+	}
+
+	page = append(page, make([]byte, 8)...) // LaserBiasCurrent
+
+	// Module-Level Monitor Thresholds (OpticalPowerRx)
+	tempOpticalRxs := []uint16{uint16(float32(module.OpticalPowerRxHighWarningThreshold) * OpticalTxRxAlarmThreshold),
+		uint16(float32(module.OpticalPowerRxLowWarningThreshold) / OpticalTxRxAlarmThreshold),
+		uint16(module.OpticalPowerRxHighWarningThreshold),
+		uint16(module.OpticalPowerRxLowWarningThreshold),
+	}
+	for _, v := range tempOpticalRxs {
+		page = append(page, byte(v>>8), byte(v&0xFF))
+	}
+
+	page = append(page, make([]byte, 55)...)   // Reserved + Custom
+	page = append(page, Checksum(page[0:126])) // Page Checksum
 	return
 }
 

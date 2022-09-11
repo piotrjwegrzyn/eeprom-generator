@@ -8,31 +8,29 @@ import (
 )
 
 type Module struct {
-	SFF8024Identifier                    int    `yaml:"SFF8024Identifier"`
-	CmisRevision                         int    `yaml:"CmisRevision"`
-	ModuleRevision                       int    `yaml:"ModuleRevision"`
-	MediaType                            int    `yaml:"MediaType"`
-	VendorName                           string `yaml:"VendorName"`
-	DateCode                             string `yaml:"DateCode"`
-	MaxPower                             int    `yaml:"MaxPower"`
-	LenghtSMF                            int    `yaml:"LenghtSMF"`
-	ModuleTempMax                        int    `yaml:"ModuleTempMax"`
-	ModuleTempMin                        int    `yaml:"ModuleTempMin"`
-	TempMonHighWarningThreshold          int    `yaml:"TempMonHighWarningThreshold"`
-	TempMonLowWarningThreshold           int    `yaml:"TempMonLowWarningThreshold"`
-	VccMonHighWarningThreshold           int    `yaml:"VccMonHighWarningThreshold"`
-	VccMonLowWarningThreshold            int    `yaml:"VccMonLowWarningThreshold"`
-	OpticalPowerTxHighWarningThreshold   int    `yaml:"OpticalPowerTxHighWarningThreshold"`
-	OpticalPowerTxLowWarningThreshold    int    `yaml:"OpticalPowerTxLowWarningThreshold"`
-	LaserBiasCurrentHighWarningThreshold int    `yaml:"LaserBiasCurrentHighWarningThreshold"`
-	LaserBiasCurrentLowWarningThreshold  int    `yaml:"LaserBiasCurrentLowWarningThreshold"`
-	OpticalPowerRxHighWarningThreshold   int    `yaml:"OpticalPowerRxHighWarningThreshold"`
-	OpticalPowerRxLowWarningThreshold    int    `yaml:"OpticalPowerRxLowWarningThreshold"`
-	ProgOutputPowerMin                   int    `yaml:"ProgOutputPowerMin"`
-	ProgOutputPowerMax                   int    `yaml:"ProgOutputPowerMax"`
-	GridSpacingTxx                       int    `yaml:"GridSpacingTxx"`
-	CurrentLaserFrequencyTxx             int    `yaml:"CurrentLaserFrequencyTxx"`
-	TargetOutputPowerTxx                 int    `yaml:"TargetOutputPowerTxx"`
+	SFF8024Identifier                  int    `yaml:"SFF8024Identifier"`
+	CmisRevision                       int    `yaml:"CmisRevision"`
+	ModuleRevision                     int    `yaml:"ModuleRevision"`
+	MediaType                          int    `yaml:"MediaType"`
+	VendorName                         string `yaml:"VendorName"`
+	DateCode                           string `yaml:"DateCode"`
+	MaxPower                           int    `yaml:"MaxPower"`
+	LenghtSMF                          int    `yaml:"LenghtSMF"`
+	ModuleTempMax                      int    `yaml:"ModuleTempMax"`
+	ModuleTempMin                      int    `yaml:"ModuleTempMin"`
+	TempMonHighWarningThreshold        int    `yaml:"TempMonHighWarningThreshold"`
+	TempMonLowWarningThreshold         int    `yaml:"TempMonLowWarningThreshold"`
+	VccMonHighWarningThreshold         int    `yaml:"VccMonHighWarningThreshold"`
+	VccMonLowWarningThreshold          int    `yaml:"VccMonLowWarningThreshold"`
+	OpticalPowerTxHighWarningThreshold int    `yaml:"OpticalPowerTxHighWarningThreshold"`
+	OpticalPowerTxLowWarningThreshold  int    `yaml:"OpticalPowerTxLowWarningThreshold"`
+	OpticalPowerRxHighWarningThreshold int    `yaml:"OpticalPowerRxHighWarningThreshold"`
+	OpticalPowerRxLowWarningThreshold  int    `yaml:"OpticalPowerRxLowWarningThreshold"`
+	ProgOutputPowerMin                 int    `yaml:"ProgOutputPowerMin"`
+	ProgOutputPowerMax                 int    `yaml:"ProgOutputPowerMax"`
+	GridSpacingTxx                     int    `yaml:"GridSpacingTxx"`
+	CurrentLaserFrequencyTxx           int    `yaml:"CurrentLaserFrequencyTxx"`
+	TargetOutputPowerTxx               int    `yaml:"TargetOutputPowerTxx"`
 }
 
 type ModulesConfig struct {
