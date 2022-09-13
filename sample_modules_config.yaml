@@ -22,7 +22,7 @@ Modules:
   OpticalPowerTxHighWarningThreshold: -2.0 # in dBm
   OpticalPowerTxLowWarningThreshold: -16.0
   OpticalPowerRxHighWarningThreshold: 0.0
-  OpticalPowerRxLowWarningThreshold: -20
+  OpticalPowerRxLowWarningThreshold: -20.0
   # Page 04h
   ProgOutputPowerMin: -22.90 # in dBm
   ProgOutputPowerMax: 4.00
@@ -35,7 +35,7 @@ Modules:
 # Lower Page
 - SFF8024Identifier: 0x18 # https://www.snia.org/technology-communities/sff/specifications
   CmisRevision: 0x50
-  ModuleRevision: 0x1000 # 0x<major>00 + 0x<minor> revisions
+  ModuleRevision: 0x1234 # 0x<major>00 + 0x<minor> revisions
   MediaType: 0x02 # CMIS P116, T8-16
   # Page 00h
   VendorName: FibreFiberLtd
@@ -53,7 +53,7 @@ Modules:
   OpticalPowerTxHighWarningThreshold: -2.0 # in dBm
   OpticalPowerTxLowWarningThreshold: -16.0
   OpticalPowerRxHighWarningThreshold: 0.0
-  OpticalPowerRxLowWarningThreshold: -20
+  OpticalPowerRxLowWarningThreshold: -20.0
   # Page 04h
   ProgOutputPowerMin: -22.90 # in dBm
   ProgOutputPowerMax: 4.00

@@ -9,7 +9,7 @@ func main() {
 
 	var scenarioFilename = flag.String("scenario", "scenario.yaml", "Location of scenario yaml config")
 	var modulesFilename = flag.String("modules", "modules.yaml", "Location of modules yaml config")
-	var outputPath = flag.String("outputPath", ".", "Output of EEPROM files")
+	var outputPath = flag.String("outputs", ".", "Output of EEPROM files")
 
 	flag.Parse()
 

@@ -23,8 +23,8 @@ func DbmTo01MicroWatt(dbm float64) float64 {
 func GeneratePageLow(module Module, temperature float64, vcc float64) (page []byte) {
 	page = append(page, byte(module.SFF8024Identifier)) // SFF8024Identifier
 	page = append(page, byte(module.CmisRevision))      // CmisRevision
-	page = append(page, byte(0x04))                     // MemoryModel + SteppedConfigOnly + MciMaxSpeed
-	page = append(page, byte(0b0101))                   // ModuleState
+	page = append(page, 0x04)                           // MemoryModel + SteppedConfigOnly + MciMaxSpeed
+	page = append(page, 0b0101)                         // ModuleState
 	page = append(page, make([]byte, 5)...)             // FlagsSummary (Banks and others)
 	var flagsIndicator byte = 0
 	{
@@ -60,7 +60,7 @@ func GeneratePageLow(module Module, temperature float64, vcc float64) (page []by
 	vccMonValue := uint16(vcc * 10000)
 	page = append(page, byte(vccMonValue>>8), byte(vccMonValue&0xFF))                     // VccMonVoltage
 	page = append(page, make([]byte, 14)...)                                              // Aux + Custom + Global Controls
-	page = append(page, byte(0xFF))                                                       // Module Level Masks (Vcc + Temp)
+	page = append(page, 0xFF)                                                             // Module Level Masks (Vcc + Temp)
 	page = append(page, make([]byte, 6)...)                                               // -||- (Aux + Custom) + CDB status
 	page = append(page, byte(module.ModuleRevision>>8), byte(module.ModuleRevision&0xFF)) // Module Active Firmware Version
 	page = append(page, make([]byte, 44)...)                                              // Fault Information + Reserved + Custom
@@ -76,28 +76,45 @@ func GeneratePageLow(module Module, temperature float64, vcc float64) (page []by
 func GeneratePage00h(module Module) (page []byte) {
 	page = append(page, byte(module.SFF8024Identifier))
 	vendorName := (append(make([]byte, 0, 16), module.VendorName...))[0:16]
-	page = append(page, vendorName...)                                                // VendorName
-	page = append(page, []byte{0xCC, 0xFA, 0xCE}...)                                  // VendorOUI
-	page = append(page, append(vendorName[0:4], []byte("xx1234567890")...)...)        // VendorPN
-	page = append(page, []byte{0x01, 0x23}...)                                        // VendorRev
-	page = append(page, append(vendorName[0:4], []byte("xx1234567890")...)...)        // VendorSN
-	page = append(page, append([]byte(module.DateCode)[2:8], []byte{0x0, 0x0}...)...) // DateCode
-	page = append(page, []byte("BEST_MEMES")...)                                      // CLEI
-	page = append(page, []byte{0b11100000, byte(module.MaxPower)}...)                 // ModulePowerCharacteristics
-	page = append(page, []byte{0x00, 0x07}...)                                        // CableAssemblyLinkLength + ConnectorType
-	page = append(page, make([]byte, 6)...)                                           // Copper Cable Attenuation
-	page = append(page, []byte{0xfe, 0x00, 0x10}...)                                  // MediaLaneInformation + Cable Assembly Information + MediaInterfaceTechnology
-	page = append(page, make([]byte, 9)...)                                           // Reserved+Custom
-	page = append(page, Checksum(page[0:93]))                                         // PageChecksum
-	page = append(page, make([]byte, 33)...)                                          // Custom
+	page = append(page, vendorName...)                                         // VendorName
+	page = append(page, 0xCC, 0xFA, 0xCE)                                      // VendorOUI
+	page = append(page, append(vendorName[0:4], []byte("xx1234567890")...)...) // VendorPN
+	page = append(page, 0x01, 0x23)                                            // VendorRev
+	page = append(page, append(vendorName[0:4], []byte("xx1234567890")...)...) // VendorSN
+	page = append(page, append([]byte(module.DateCode)[2:8], 0x00, 0x00)...)   // DateCode
+	page = append(page, []byte("BEST_MEMES")...)                               // CLEI
+	page = append(page, 0b11100000, byte(module.MaxPower))                     // ModulePowerCharacteristics
+	page = append(page, 0x00, 0x07)                                            // CableAssemblyLinkLength + ConnectorType
+	page = append(page, make([]byte, 6)...)                                    // Copper Cable Attenuation
+	page = append(page, 0xfe, 0x00, 0x10)                                      // MediaLaneInformation + Cable Assembly Information + MediaInterfaceTechnology
+	page = append(page, make([]byte, 9)...)                                    // Reserved+Custom
+	page = append(page, Checksum(page[0:93]))                                  // PageChecksum
+	page = append(page, make([]byte, 33)...)                                   // Custom
 
 	return
 }
 
-func GeneratePage01h() (page []byte) {
-	for i := 0; i < 128; i++ {
-		page = append(page, byte(i))
+func GeneratePage01h(module Module) (page []byte) {
+	page = append(page, byte((module.ModuleRevision>>8)-1), byte((module.ModuleRevision&0xFF)-1)) // ModuleInactiveFirmwareRevision
+	page = append(page, byte(module.ModuleRevision>>8), byte(module.ModuleRevision&0xFF))         // ModuleHardwareRevision
+	if module.LenghtSMF > 63 || (module.LenghtSMF >= 10 && module.LenghtSMF%10 == 0) {            // LengthMultiplierSMF
+		page = append(page, byte(((module.LenghtSMF/10)&0xFFFFFF)|(0x10<<6)))
+	} else {
+		page = append(page, byte((module.LenghtSMF&0xFFFFFF)|(0x1<<6)))
 	}
+	page = append(page, make([]byte, 5)...)                                     // LengthOMs + Reserved
+	page = append(page, 0x77, 0xDD, 0x00, 0x2F)                                 // NominalWavelength + WavelengthTolerance
+	page = append(page, 0b1000000)                                              // Supported Pages Advertising
+	page = append(page, 0x04, 0x79, 0x00)                                       // Durations Advertising + Module Characteristics Advertising
+	page = append(page, byte(module.ModuleTempMax), byte(module.ModuleTempMin)) // ModuleTemp
+	page = append(page, make([]byte, 7)...)                                     // PropagationDelay + OperatingVoltageMin + Others
+	page = append(page, 0b1000000)                                              // TransmitterIsTunable
+	page = append(page, make([]byte, 3)...)                                     // Others
+	page = append(page, 0b11, 0b110)                                            // VccMonSupported + TempMonSupported + RxTxOpticalPowerMonSupported
+	page = append(page, make([]byte, 6)...)                                     // ???
+	page = append(page, 0x79, 0x14)                                             // MaxDurationModulePwr + MaxDurationDPTxTurn
+	page = append(page, make([]byte, 86)...)                                    // MediaLaneAssignment + Custom + Reserved
+	page = append(page, Checksum(page[2:126]))                                  // Checksum
 	return
 }
 
@@ -164,66 +181,59 @@ func GeneratePage04h(module Module) (page []byte) {
 	return
 }
 
-func GeneratePage10h() (page []byte) {
-	for i := 0; i < 128; i++ {
-		page = append(page, byte(i))
-	}
-	return
-}
-
 func GeneratePage11h(module Module, txPower float64, rxPower float64) (page []byte) {
 	for i := 0; i < 4; i++ {
-		page = append(page, byte(0x44)) // DPStateHostLane
+		page = append(page, 0x44) // DPStateHostLane
 	}
-	page = append(page, byte(0xFF))         // OutputStatusRx
+	page = append(page, 0xFF)               // OutputStatusRx
 	page = append(page, make([]byte, 6)...) // OutputStatusTx + Lane-Specific State Changed Flags
 
 	// Tx Flags
 	if txPower > module.OpticalPowerTxHighWarningThreshold*OpticalTxRxAlarmThreshold {
-		page = append(page, byte(0x01))
+		page = append(page, 0x01)
 	} else {
-		page = append(page, byte(0x00))
+		page = append(page, 0x00)
 	}
 	if txPower < module.OpticalPowerTxLowWarningThreshold/OpticalTxRxAlarmThreshold {
-		page = append(page, byte(0x01))
+		page = append(page, 0x01)
 	} else {
-		page = append(page, byte(0x00))
+		page = append(page, 0x00)
 	}
 	if txPower > module.OpticalPowerTxHighWarningThreshold {
-		page = append(page, byte(0x01))
+		page = append(page, 0x01)
 	} else {
-		page = append(page, byte(0x00))
+		page = append(page, 0x00)
 	}
 	if txPower < module.OpticalPowerTxLowWarningThreshold {
-		page = append(page, byte(0x01))
+		page = append(page, 0x01)
 	} else {
-		page = append(page, byte(0x00))
+		page = append(page, 0x00)
 	}
 	page = append(page, make([]byte, 6)...) // LaserBias + LOS + CDRLOL
 
 	// Rx Flags
 	if rxPower > module.OpticalPowerRxHighWarningThreshold*OpticalTxRxAlarmThreshold {
-		page = append(page, byte(0x01))
+		page = append(page, 0x01)
 	} else {
-		page = append(page, byte(0x00))
+		page = append(page, 0x00)
 	}
 	if rxPower < module.OpticalPowerRxLowWarningThreshold/OpticalTxRxAlarmThreshold {
-		page = append(page, byte(0x01))
+		page = append(page, 0x01)
 	} else {
-		page = append(page, byte(0x00))
+		page = append(page, 0x00)
 	}
 	if rxPower > module.OpticalPowerRxHighWarningThreshold {
-		page = append(page, byte(0x01))
+		page = append(page, 0x01)
 	} else {
-		page = append(page, byte(0x00))
+		page = append(page, 0x00)
 	}
 	if rxPower < module.OpticalPowerRxLowWarningThreshold {
-		page = append(page, byte(0x01))
+		page = append(page, 0x01)
 	} else {
-		page = append(page, byte(0x00))
+		page = append(page, 0x00)
 	}
 
-	page = append(page, byte(0x00)) // OutputStatusChangedFlagRx
+	page = append(page, 0x00) // OutputStatusChangedFlagRx
 	txPower01microW := uint16(DbmTo01MicroWatt(txPower))
 	page = append(page, byte(txPower01microW>>8), byte(txPower01microW&0xFF)) // OpticalPowerTx1
 	page = append(page, make([]byte, 30)...)                                  // OpticalPowerTx2-8 + LaserBiasTx
@@ -231,20 +241,20 @@ func GeneratePage11h(module Module, txPower float64, rxPower float64) (page []by
 	page = append(page, byte(rxPower01microW>>8), byte(rxPower01microW&0xFF)) // OpticalPowerRx1
 	page = append(page, make([]byte, 14)...)                                  // OpticalPowerRx2-8
 	for i := 0; i < 4; i++ {
-		page = append(page, byte(0x11)) // ConfigStatusLane
+		page = append(page, 0x11) // ConfigStatusLane
 	}
 	page = append(page, make([]byte, 8)...)  // AppSelCodeLane
 	page = append(page, make([]byte, 26)...) // Indicators for Active Control Set + Data Path Conditions + Reserved
-	page = append(page, byte(0x11))          // MediaLaneToWavelengthMappingTx1
+	page = append(page, 0x11)                // MediaLaneToWavelengthMappingTx1
 	page = append(page, make([]byte, 7)...)  // MediaLaneToWavelengthMappingTx2-8
-	page = append(page, byte(0x11))          // MediaLaneToWavelengthMappingRx1
+	page = append(page, 0x11)                // MediaLaneToWavelengthMappingRx1
 	page = append(page, make([]byte, 7)...)  // MediaLaneToWavelengthMappingRx2-8
 
 	return
 }
 
 func GeneratePage12h(module Module) (page []byte) {
-	page = append(page, byte(0b0101<<4))    // GridSpacingTx1
+	page = append(page, 0b0101<<4)          // GridSpacingTx1
 	page = append(page, make([]byte, 7)...) // GridSpacingTx2-8
 	channelNumber := int16((module.CurrentLaserFrequencyTxx - 193100000) / 100)
 	page = append(page, byte(channelNumber>>8), byte(channelNumber&0xFF)) // ChannelNumberTx1
@@ -262,7 +272,7 @@ func GeneratePage25h(osnr float64, temperature float64) (page []byte) {
 	page = append(page, make([]byte, 36)...)
 	rand.Seed(time.Now().UTC().UnixNano())
 	if osnr == 0.0 { // VDM real-time OSNR
-		page = append(page, byte(0x0), byte(0x0))
+		page = append(page, 0x00, 0x00)
 	} else {
 		modOsnr := uint16(10*osnr + (float64(rand.Intn(2*int(temperature))-int(temperature)) / 3))
 		page = append(page, []byte{byte(modOsnr >> 8), byte(modOsnr & 0xFF)}...)
