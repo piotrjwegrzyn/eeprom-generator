@@ -55,42 +55,19 @@ type ScenarioConfig struct {
 	ScenarioModules []ScenarioModule `yaml:"ScenarioModules"`
 }
 
-func GetModulesConfig(filename string) ModulesConfig {
+func GetConfig[Config ModulesConfig | ScenarioConfig](filename string, configYaml *Config) {
 
 	modulesConfig, err := os.ReadFile(filename)
 
 	if err != nil {
 		fmt.Printf("Error while opening file %s\n", filename)
-		panic(1)
+		os.Exit(0)
 	}
 
-	modulesYaml := ModulesConfig{}
-	err = yaml.Unmarshal(modulesConfig, &modulesYaml)
+	err = yaml.Unmarshal(modulesConfig, configYaml)
 
 	if err != nil {
 		fmt.Printf("Error while parsing file %s\n", filename)
-		panic(1)
+		os.Exit(0)
 	}
-
-	return modulesYaml
-}
-
-func GetScenarioConfig(filename string) ScenarioConfig {
-
-	scenarioConfig, err := os.ReadFile(filename)
-
-	if err != nil {
-		fmt.Printf("Error while opening file %s\n", filename)
-		panic(1)
-	}
-
-	scenarioYaml := ScenarioConfig{}
-	err = yaml.Unmarshal(scenarioConfig, &scenarioYaml)
-
-	if err != nil {
-		fmt.Printf("Error while parsing file %s\n", filename)
-		panic(1)
-	}
-
-	return scenarioYaml
 }
