@@ -2,6 +2,7 @@ package opers
 
 import (
 	"crypto/md5"
+	"math"
 	"math/rand"
 	"time"
 )
@@ -11,11 +12,15 @@ func Checksum(data []byte) byte {
 	return checksum[len(checksum)-1]
 }
 
-const TempMonAlarmThreshold int = 10           // in Celsius degrees, added/substracted as High/Low Alarm
-const VccMonAlarmThreshold int = 300           // in 0.1 mV, -||-
-const OpticalTxRxAlarmThreshold float32 = 1.25 // multiplicable factor for Optics Alarms
+const TempMonAlarmThreshold float64 = 10.0     // in Celsius degrees, added/substracted as High/Low Alarm
+const VccMonAlarmThreshold float64 = 0.3       // in V, -||-
+const OpticalTxRxAlarmThreshold float64 = 1.33 // multiplicable factor for Optics Alarms
 
-func GeneratePageLow(module Module, temperature float32, vcc uint16) (page []byte) {
+func DbmTo01MicroWatt(dbm float64) float64 {
+	return math.Pow(10, (dbm+40)/10)
+}
+
+func GeneratePageLow(module Module, temperature float64, vcc float64) (page []byte) {
 	page = append(page, byte(module.SFF8024Identifier)) // SFF8024Identifier
 	page = append(page, byte(module.CmisRevision))      // CmisRevision
 	page = append(page, byte(0x04))                     // MemoryModel + SteppedConfigOnly + MciMaxSpeed
@@ -23,36 +28,37 @@ func GeneratePageLow(module Module, temperature float32, vcc uint16) (page []byt
 	page = append(page, make([]byte, 5)...)             // FlagsSummary (Banks and others)
 	var flagsIndicator byte = 0
 	{
-		if vcc < uint16(module.VccMonLowWarningThreshold) {
+		if vcc < module.VccMonLowWarningThreshold {
 			flagsIndicator = flagsIndicator | (0x1 << 7)
 		}
-		if vcc > uint16(module.VccMonHighWarningThreshold) {
+		if vcc > module.VccMonHighWarningThreshold {
 			flagsIndicator = flagsIndicator | (0x1 << 6)
 		}
-		if vcc < uint16(module.VccMonLowWarningThreshold-VccMonAlarmThreshold) {
+		if vcc < (module.VccMonLowWarningThreshold - VccMonAlarmThreshold) {
 			flagsIndicator = flagsIndicator | (0x1 << 5)
 		}
-		if vcc > uint16(module.VccMonHighWarningThreshold+VccMonAlarmThreshold) {
+		if vcc > (module.VccMonHighWarningThreshold + VccMonAlarmThreshold) {
 			flagsIndicator = flagsIndicator | (0x1 << 4)
 		}
-		if temperature < float32(module.TempMonLowWarningThreshold) {
+		if temperature < module.TempMonLowWarningThreshold {
 			flagsIndicator = flagsIndicator | (0x1 << 3)
 		}
-		if temperature > float32(module.TempMonHighWarningThreshold) {
+		if temperature > module.TempMonHighWarningThreshold {
 			flagsIndicator = flagsIndicator | (0x1 << 2)
 		}
-		if temperature < float32(module.TempMonLowWarningThreshold-TempMonAlarmThreshold) {
+		if temperature < module.TempMonLowWarningThreshold-TempMonAlarmThreshold {
 			flagsIndicator = flagsIndicator | (0x1 << 1)
 		}
-		if temperature > float32(module.TempMonHighWarningThreshold+TempMonAlarmThreshold) {
+		if temperature > module.TempMonHighWarningThreshold+TempMonAlarmThreshold {
 			flagsIndicator = flagsIndicator | 0x1
 		}
 	}
 	page = append(page, flagsIndicator)     // Latched Flags
 	page = append(page, make([]byte, 4)...) // Aux and Custom Flags
-	TempMonValue := int16(temperature * 256)
-	page = append(page, byte(TempMonValue>>8), byte(TempMonValue&0xFF))                   // TempMonValue
-	page = append(page, byte(vcc>>8), byte(vcc&0xFF))                                     // VccMonVoltage
+	tempMonValue := int16(temperature * 256 / 10)
+	page = append(page, byte(tempMonValue>>8), byte(tempMonValue&0xFF)) // TempMonValue
+	vccMonValue := uint16(vcc * 10000)
+	page = append(page, byte(vccMonValue>>8), byte(vccMonValue&0xFF))                     // VccMonVoltage
 	page = append(page, make([]byte, 14)...)                                              // Aux + Custom + Global Controls
 	page = append(page, byte(0xFF))                                                       // Module Level Masks (Vcc + Temp)
 	page = append(page, make([]byte, 6)...)                                               // -||- (Aux + Custom) + CDB status
@@ -107,10 +113,10 @@ func GeneratePage02h(module Module) (page []byte) {
 	}
 
 	// Module-Level Monitor Thresholds (Vcc)
-	tempVccs := []uint16{uint16(module.VccMonHighWarningThreshold + VccMonAlarmThreshold),
-		uint16(module.VccMonLowWarningThreshold - VccMonAlarmThreshold),
-		uint16(module.VccMonHighWarningThreshold),
-		uint16(module.VccMonLowWarningThreshold),
+	tempVccs := []uint16{uint16((module.VccMonHighWarningThreshold + VccMonAlarmThreshold) * 10000),
+		uint16((module.VccMonLowWarningThreshold - VccMonAlarmThreshold) * 10000),
+		uint16(module.VccMonHighWarningThreshold * 10000),
+		uint16(module.VccMonLowWarningThreshold * 10000),
 	}
 	for _, v := range tempVccs {
 		page = append(page, byte(v>>8), byte(v&0xFF))
@@ -119,10 +125,10 @@ func GeneratePage02h(module Module) (page []byte) {
 	page = append(page, make([]byte, 32)...) // Aux + Custom
 
 	// Module-Level Monitor Thresholds (OpticalPowerTx)
-	tempOpticalTxs := []uint16{uint16(float32(module.OpticalPowerTxHighWarningThreshold) * OpticalTxRxAlarmThreshold),
-		uint16(float32(module.OpticalPowerTxLowWarningThreshold) / OpticalTxRxAlarmThreshold),
-		uint16(module.OpticalPowerTxHighWarningThreshold),
-		uint16(module.OpticalPowerTxLowWarningThreshold),
+	tempOpticalTxs := []uint16{uint16(DbmTo01MicroWatt(module.OpticalPowerTxHighWarningThreshold) * OpticalTxRxAlarmThreshold),
+		uint16(DbmTo01MicroWatt(module.OpticalPowerTxLowWarningThreshold) / OpticalTxRxAlarmThreshold),
+		uint16(DbmTo01MicroWatt(module.OpticalPowerTxHighWarningThreshold)),
+		uint16(DbmTo01MicroWatt(module.OpticalPowerTxLowWarningThreshold)),
 	}
 	for _, v := range tempOpticalTxs {
 		page = append(page, byte(v>>8), byte(v&0xFF))
@@ -131,10 +137,10 @@ func GeneratePage02h(module Module) (page []byte) {
 	page = append(page, make([]byte, 8)...) // LaserBiasCurrent
 
 	// Module-Level Monitor Thresholds (OpticalPowerRx)
-	tempOpticalRxs := []uint16{uint16(float32(module.OpticalPowerRxHighWarningThreshold) * OpticalTxRxAlarmThreshold),
-		uint16(float32(module.OpticalPowerRxLowWarningThreshold) / OpticalTxRxAlarmThreshold),
-		uint16(module.OpticalPowerRxHighWarningThreshold),
-		uint16(module.OpticalPowerRxLowWarningThreshold),
+	tempOpticalRxs := []uint16{uint16(DbmTo01MicroWatt(module.OpticalPowerRxHighWarningThreshold) * OpticalTxRxAlarmThreshold),
+		uint16(DbmTo01MicroWatt(module.OpticalPowerRxLowWarningThreshold) / OpticalTxRxAlarmThreshold),
+		uint16(DbmTo01MicroWatt(module.OpticalPowerRxHighWarningThreshold)),
+		uint16(DbmTo01MicroWatt(module.OpticalPowerRxLowWarningThreshold)),
 	}
 	for _, v := range tempOpticalRxs {
 		page = append(page, byte(v>>8), byte(v&0xFF))
@@ -147,13 +153,14 @@ func GeneratePage02h(module Module) (page []byte) {
 
 func GeneratePage04h(module Module) (page []byte) {
 	page = append(page, byte(1<<5))
-	page = append(page, make([]byte, 21)...)                                                      // Unsupported Grids
-	page = append(page, 0xFF, 0xEE, 0x00, 0x1E)                                                   // GridChannel100GHz
-	page = append(page, make([]byte, 44)...)                                                      // Unsupported Grids + FineTuning
-	page = append(page, byte(module.ProgOutputPowerMin>>8), byte(module.ProgOutputPowerMin&0xFF)) // ProgOutputPowerMin
-	page = append(page, byte(module.ProgOutputPowerMax>>8), byte(module.ProgOutputPowerMax&0xFF)) // ProgOutputPowerMax
-	page = append(page, make([]byte, 53)...)                                                      // Reserved
-	page = append(page, Checksum(page[0:126]))                                                    // Page Checksum
+	page = append(page, make([]byte, 21)...)    // Unsupported Grids
+	page = append(page, 0xFF, 0xEE, 0x00, 0x1E) // GridChannel100GHz
+	page = append(page, make([]byte, 44)...)    // Unsupported Grids + FineTuning
+	minPwr, maxPwr := uint16(module.ProgOutputPowerMin*100), uint16(module.ProgOutputPowerMax*100)
+	page = append(page, byte(minPwr>>8), byte(minPwr&0xFF)) // ProgOutputPowerMin
+	page = append(page, byte(maxPwr>>8), byte(maxPwr&0xFF)) // ProgOutputPowerMax
+	page = append(page, make([]byte, 53)...)                // Reserved
+	page = append(page, Checksum(page[0:126]))              // Page Checksum
 	return
 }
 
@@ -164,10 +171,75 @@ func GeneratePage10h() (page []byte) {
 	return
 }
 
-func GeneratePage11h() (page []byte) {
-	for i := 0; i < 128; i++ {
-		page = append(page, byte(i))
+func GeneratePage11h(module Module, txPower float64, rxPower float64) (page []byte) {
+	for i := 0; i < 4; i++ {
+		page = append(page, byte(0x44)) // DPStateHostLane
 	}
+	page = append(page, byte(0xFF))         // OutputStatusRx
+	page = append(page, make([]byte, 6)...) // OutputStatusTx + Lane-Specific State Changed Flags
+
+	// Tx Flags
+	if txPower > module.OpticalPowerTxHighWarningThreshold*OpticalTxRxAlarmThreshold {
+		page = append(page, byte(0x01))
+	} else {
+		page = append(page, byte(0x00))
+	}
+	if txPower < module.OpticalPowerTxLowWarningThreshold/OpticalTxRxAlarmThreshold {
+		page = append(page, byte(0x01))
+	} else {
+		page = append(page, byte(0x00))
+	}
+	if txPower > module.OpticalPowerTxHighWarningThreshold {
+		page = append(page, byte(0x01))
+	} else {
+		page = append(page, byte(0x00))
+	}
+	if txPower < module.OpticalPowerTxLowWarningThreshold {
+		page = append(page, byte(0x01))
+	} else {
+		page = append(page, byte(0x00))
+	}
+	page = append(page, make([]byte, 6)...) // LaserBias + LOS + CDRLOL
+
+	// Rx Flags
+	if rxPower > module.OpticalPowerRxHighWarningThreshold*OpticalTxRxAlarmThreshold {
+		page = append(page, byte(0x01))
+	} else {
+		page = append(page, byte(0x00))
+	}
+	if rxPower < module.OpticalPowerRxLowWarningThreshold/OpticalTxRxAlarmThreshold {
+		page = append(page, byte(0x01))
+	} else {
+		page = append(page, byte(0x00))
+	}
+	if rxPower > module.OpticalPowerRxHighWarningThreshold {
+		page = append(page, byte(0x01))
+	} else {
+		page = append(page, byte(0x00))
+	}
+	if rxPower < module.OpticalPowerRxLowWarningThreshold {
+		page = append(page, byte(0x01))
+	} else {
+		page = append(page, byte(0x00))
+	}
+
+	page = append(page, byte(0x00)) // OutputStatusChangedFlagRx
+	txPower01microW := uint16(DbmTo01MicroWatt(txPower))
+	page = append(page, byte(txPower01microW>>8), byte(txPower01microW&0xFF)) // OpticalPowerTx1
+	page = append(page, make([]byte, 30)...)                                  // OpticalPowerTx2-8 + LaserBiasTx
+	rxPower01microW := uint16(DbmTo01MicroWatt(rxPower))
+	page = append(page, byte(rxPower01microW>>8), byte(rxPower01microW&0xFF)) // OpticalPowerRx1
+	page = append(page, make([]byte, 14)...)                                  // OpticalPowerRx2-8
+	for i := 0; i < 4; i++ {
+		page = append(page, byte(0x11)) // ConfigStatusLane
+	}
+	page = append(page, make([]byte, 8)...)  // AppSelCodeLane
+	page = append(page, make([]byte, 26)...) // Indicators for Active Control Set + Data Path Conditions + Reserved
+	page = append(page, byte(0x11))          // MediaLaneToWavelengthMappingTx1
+	page = append(page, make([]byte, 7)...)  // MediaLaneToWavelengthMappingTx2-8
+	page = append(page, byte(0x11))          // MediaLaneToWavelengthMappingRx1
+	page = append(page, make([]byte, 7)...)  // MediaLaneToWavelengthMappingRx2-8
+
 	return
 }
 
@@ -186,12 +258,16 @@ func GeneratePage12h(module Module) (page []byte) {
 	return
 }
 
-func GeneratePage25h(osnr int, temperature int) (page []byte) {
-	page = append(page, make([]byte, 32)...)
+func GeneratePage25h(osnr float64, temperature float64) (page []byte) {
+	page = append(page, make([]byte, 36)...)
 	rand.Seed(time.Now().UTC().UnixNano())
-	modOsnr := uint16(osnr + (rand.Intn(2*temperature)-temperature)/3)
-	page = append(page, []byte{byte(modOsnr >> 8), byte(modOsnr & 0xFF)}...) // VDM real-time OSNR
-	page = append(page, make([]byte, 94)...)
+	if osnr == 0.0 { // VDM real-time OSNR
+		page = append(page, byte(0x0), byte(0x0))
+	} else {
+		modOsnr := uint16(10*osnr + (float64(rand.Intn(2*int(temperature))-int(temperature)) / 3))
+		page = append(page, []byte{byte(modOsnr >> 8), byte(modOsnr & 0xFF)}...)
+	}
+	page = append(page, make([]byte, 90)...)
 
 	return
 }

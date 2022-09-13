@@ -1,53 +1,53 @@
 ---
 ScenarioDuration: 300
 ScenarioModules:
-  - Voltage: # in mV
-      - endval: 33000
+  - Voltage: # in V
+      - endval: 33.0
         duration: 300
-    Temperature: # in 0.1 C's degrees
-      - endval: 330
+    Temperature: # in C's degrees
+      - endval: 33.0
         duration: 120
-      - endval: 320
+      - endval: 32.0
         duration: 180
-    TxPower: # in 0.01 dBm
-      - endval: -1000
+    TxPower: # in dBm
+      - endval: -10.00
         duration: 300
-    RxPower: # in 0.01 dBm
-      - endval: -1100
+    RxPower: # in dBm
+      - endval: -11.00
         duration: 120
-      - endval: -3850
+      - endval: -38.50
         duration: 1
-      - endval: -3850
+      - endval: -38.50
         duration: 179
-    Osnr: # in 0.1 dB
-      - endval: 230
+    Osnr: # in dB
+      - endval: 23.0
         duration: 120
-      - endval: 0
+      - endval: 0.0
         duration: 1
-      - endval: 0
+      - endval: 0.0
         duration: 179
   
   - Voltage:
-      - endval: 33000
+      - endval: 33.000
         duration: 300
     Temperature:
-      - endval: 310
+      - endval: 31.0
         duration: 300
     TxPower:
-      - endval: -1000
+      - endval: -10.00
         duration: 300
     RxPower:
-      - endval: -1100
+      - endval: -11.00
         duration: 120
-      - endval: -3850
+      - endval: -38.50
         duration: 1
-      - endval: -3850
+      - endval: -38.50
         duration: 179
     Osnr:
-      - endval: 230
+      - endval: 23.0
         duration: 120
-      - endval: 0
+      - endval: 0.0
         duration: 1
-      - endval: 0
+      - endval: 0.0
         duration: 179
 ...

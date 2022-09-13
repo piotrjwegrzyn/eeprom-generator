@@ -12,24 +12,24 @@ Modules:
   MaxPower: 0x50  # U8 max power consumption (multiplied by 0.25W)
   # Page 01h
   LenghtSMF: 120 # in kilometers
-  ModuleTempMax: 60 # in Celsius degrees
-  ModuleTempMin: 0
+  ModuleTempMax: 60.0 # in 0.1 Celsius degrees
+  ModuleTempMin: 0.0
   # Page 02h
-  TempMonHighWarningThreshold: 75
-  TempMonLowWarningThreshold: 15
-  VccMonHighWarningThreshold: 34320 # in 0.1 mV
-  VccMonLowWarningThreshold: 31680
-  OpticalPowerTxHighWarningThreshold: 6309 # in 0.1 uW
-  OpticalPowerTxLowWarningThreshold: 251
-  OpticalPowerRxHighWarningThreshold: 10000 # in 0.1 uW
-  OpticalPowerRxLowWarningThreshold: 100
+  TempMonHighWarningThreshold: 75.0 # in Celsius degrees
+  TempMonLowWarningThreshold: 15.0
+  VccMonHighWarningThreshold: 3.4320 # in V
+  VccMonLowWarningThreshold: 3.1680
+  OpticalPowerTxHighWarningThreshold: -2.0 # in dBm
+  OpticalPowerTxLowWarningThreshold: -16.0
+  OpticalPowerRxHighWarningThreshold: 0.0
+  OpticalPowerRxLowWarningThreshold: -20
   # Page 04h
-  ProgOutputPowerMin: -2290 # in 0.01 dBm
-  ProgOutputPowerMax: 400
+  ProgOutputPowerMin: -22.90 # in dBm
+  ProgOutputPowerMax: 4.00
   # Page 12h
   GridSpacingTxx: 0x50 # CMIS P173, T8-65
   CurrentLaserFrequencyTxx: 193100000 # in MHz
-  TargetOutputPowerTxx: -1250 # in 0.01 dBm
+  TargetOutputPowerTxx: -12.50 # in dBm
 
 ## Module 2
 # Lower Page
@@ -43,21 +43,21 @@ Modules:
   MaxPower: 0x50  # U8 max power consumption (multiplied by 0.25W)
   # Page 01h
   LenghtSMF: 120 # in kilometers
-  ModuleTempMax: 60 # in Celsius degrees
-  ModuleTempMin: 0
+  ModuleTempMax: 60.0 # in Celsius degrees
+  ModuleTempMin: 0.0
   # Page 02h
-  TempMonHighWarningThreshold: 75
-  TempMonLowWarningThreshold: 15
-  VccMonHighWarningThreshold: 34320 # in 0.1 mV
-  VccMonLowWarningThreshold: 31680
-  OpticalPowerTxHighWarningThreshold: 6309 # in 0.1 uW
-  OpticalPowerTxLowWarningThreshold: 251
-  OpticalPowerRxHighWarningThreshold: 10000 # in 0.1 uW
-  OpticalPowerRxLowWarningThreshold: 100
+  TempMonHighWarningThreshold: 75.0 # in Celsius degrees
+  TempMonLowWarningThreshold: 15.0
+  VccMonHighWarningThreshold: 3.4320 # in V
+  VccMonLowWarningThreshold: 3.1680
+  OpticalPowerTxHighWarningThreshold: -2.0 # in dBm
+  OpticalPowerTxLowWarningThreshold: -16.0
+  OpticalPowerRxHighWarningThreshold: 0.0
+  OpticalPowerRxLowWarningThreshold: -20
   # Page 04h
-  ProgOutputPowerMin: -2290 # in 0.01 dBm
-  ProgOutputPowerMax: 400
+  ProgOutputPowerMin: -22.90 # in dBm
+  ProgOutputPowerMax: 4.00
   # Page 12h
   CurrentLaserFrequencyTxx: 193100000 # in MHz
-  TargetOutputPowerTxx: -1250 # in 0.01 dBm
+  TargetOutputPowerTxx: -12.50 # in  dBm
 ...
