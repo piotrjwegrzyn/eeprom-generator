@@ -8,6 +8,7 @@ import (
 )
 
 type Module struct {
+	Interface                          string  `yaml:"Interface"`
 	SFF8024Identifier                  int     `yaml:"SFF8024Identifier"`
 	CmisRevision                       int     `yaml:"CmisRevision"`
 	ModuleRevision                     int     `yaml:"ModuleRevision"`

@@ -1,8 +1,9 @@
 ---
 Modules:
-  ## Module 1
+## Module 1
+- Interface: eth1 # folder name
   # Lower Page
-- SFF8024Identifier: 0x18 # https://www.snia.org/technology-communities/sff/specifications
+  SFF8024Identifier: 0x18 # https://www.snia.org/technology-communities/sff/specifications
   CmisRevision: 0x50
   ModuleRevision: 0x1000 # 0x<major> << 8 + 0x<minor> revisions
   MediaType: 0x02 # CMIS P116, T8-16
@@ -32,8 +33,9 @@ Modules:
   TargetOutputPowerTxx: -12.50 # in dBm
 
 ## Module 2
-# Lower Page
-- SFF8024Identifier: 0x18 # https://www.snia.org/technology-communities/sff/specifications
+- Interface: enp0s1 # folder name
+  # Lower Page
+  SFF8024Identifier: 0x18 # https://www.snia.org/technology-communities/sff/specifications
   CmisRevision: 0x50
   ModuleRevision: 0x1234 # 0x<major>00 + 0x<minor> revisions
   MediaType: 0x02 # CMIS P116, T8-16
