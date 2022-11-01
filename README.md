@@ -21,7 +21,7 @@ Tested on Go 1.19.
 ## Usage
 Type in CMD/Terminal:
 ```
-./eeprom-generator -scenario <SCENARIO_CONFIG.yaml> -modules <MODULES_CONFIG.yaml> -outputs <YOUR_PATH>
+./eeprom-generator -scenario <SCENARIO_CONFIG.yaml> -modules <MODULES_CONFIG.yaml> -location <YOUR_PATH>
 ```
 
 ## Config creation

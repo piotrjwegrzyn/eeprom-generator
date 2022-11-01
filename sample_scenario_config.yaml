@@ -2,7 +2,7 @@
 ScenarioDuration: 300
 ScenarioModules:
   - Voltage: # in V
-      - endval: 33.0
+      - endval: 3.3
         duration: 300
     Temperature: # in C's degrees
       - endval: 33.0
@@ -28,7 +28,7 @@ ScenarioModules:
         duration: 179
   
   - Voltage:
-      - endval: 33.000
+      - endval: 3.3
         duration: 300
     Temperature:
       - endval: 31.0

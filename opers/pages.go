@@ -269,7 +269,7 @@ func GeneratePage12h(module Module) (page []byte) {
 }
 
 func GeneratePage25h(osnr float64, temperature float64) (page []byte) {
-	page = append(page, make([]byte, 36)...)
+	page = append(page, make([]byte, 22)...)
 	rand.Seed(time.Now().UTC().UnixNano())
 	if osnr == 0.0 { // VDM real-time OSNR
 		page = append(page, 0x00, 0x00)
@@ -277,7 +277,7 @@ func GeneratePage25h(osnr float64, temperature float64) (page []byte) {
 		modOsnr := uint16(10*osnr + (float64(rand.Intn(2*int(temperature))-int(temperature)) / 3))
 		page = append(page, []byte{byte(modOsnr >> 8), byte(modOsnr & 0xFF)}...)
 	}
-	page = append(page, make([]byte, 90)...)
+	page = append(page, make([]byte, 104)...)
 
 	return
 }
