@@ -21,6 +21,8 @@ func DbmTo01MicroWatt(dbm float64) float64 {
 }
 
 func GeneratePageLow(module Module, temperature float64, vcc float64) (page []byte) {
+	temperature = temperature + 2*rand.Float64() - 1
+	vcc = vcc + rand.Float64()/500 - 0.001
 	page = append(page, byte(module.SFF8024Identifier)) // SFF8024Identifier
 	page = append(page, byte(module.CmisRevision))      // CmisRevision
 	page = append(page, 0x04)                           // MemoryModel + SteppedConfigOnly + MciMaxSpeed
@@ -234,10 +236,10 @@ func GeneratePage11h(module Module, txPower float64, rxPower float64) (page []by
 	}
 
 	page = append(page, 0x00) // OutputStatusChangedFlagRx
-	txPower01microW := uint16(DbmTo01MicroWatt(txPower))
+	txPower01microW := uint16(DbmTo01MicroWatt(txPower) + 2*rand.Float64() - 1)
 	page = append(page, byte(txPower01microW>>8), byte(txPower01microW&0xFF)) // OpticalPowerTx1
 	page = append(page, make([]byte, 30)...)                                  // OpticalPowerTx2-8 + LaserBiasTx
-	rxPower01microW := uint16(DbmTo01MicroWatt(rxPower))
+	rxPower01microW := uint16(DbmTo01MicroWatt(rxPower) + 2*rand.Float64() - 1)
 	page = append(page, byte(rxPower01microW>>8), byte(rxPower01microW&0xFF)) // OpticalPowerRx1
 	page = append(page, make([]byte, 14)...)                                  // OpticalPowerRx2-8
 	for i := 0; i < 4; i++ {
