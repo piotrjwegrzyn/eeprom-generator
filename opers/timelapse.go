@@ -36,15 +36,21 @@ func CreateTimelapse(module Module, scenario ScenarioModule, duration int) (time
 	listRxPower := generateSteps(scenario.RxPower, duration)
 	listOsnr := generateSteps(scenario.Osnr, duration)
 
+	page00h := GeneratePage00h(module)
+	page01h := GeneratePage01h(module)
+	page02h := GeneratePage02h(module)
+	page04h := GeneratePage04h(module)
+	page12h := GeneratePage12h(module)
+
 	for i := 0; i < duration; i++ {
 		timelapseStep := make([]byte, 0)
 		timelapseStep = append(timelapseStep, GeneratePageLow(module, listTemp[i], listVcc[i])...)
-		timelapseStep = append(timelapseStep, GeneratePage00h(module)...)
-		timelapseStep = append(timelapseStep, GeneratePage01h(module)...)
-		timelapseStep = append(timelapseStep, GeneratePage02h(module)...)
-		timelapseStep = append(timelapseStep, GeneratePage04h(module)...)
+		timelapseStep = append(timelapseStep, page00h...)
+		timelapseStep = append(timelapseStep, page01h...)
+		timelapseStep = append(timelapseStep, page02h...)
+		timelapseStep = append(timelapseStep, page04h...)
 		timelapseStep = append(timelapseStep, GeneratePage11h(module, listTxPower[i], listRxPower[i])...)
-		timelapseStep = append(timelapseStep, GeneratePage12h(module)...)
+		timelapseStep = append(timelapseStep, page12h...)
 		timelapseStep = append(timelapseStep, GeneratePage25h(listOsnr[i], listTemp[i])...)
 		timelapse = append(timelapse, timelapseStep)
 	}

@@ -8,7 +8,7 @@ import (
 	"pi-wegrzyn/eeprom-generator/opers"
 )
 
-const version string = "1.2"
+const version string = "1.2.1"
 
 func main() {
 
