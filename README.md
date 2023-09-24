@@ -1,3 +1,6 @@
+# ⚠️ DEPRECATION NOTICE ⚠️
+This project has been merged into [EMS repository](https://github.com/piotrjwegrzyn/eeprom-monitoring-server).
+
 # eeprom-generator
 Simple tool for generating some EEPROM pages of optical modules. Compatible with CMIS 5.
 
